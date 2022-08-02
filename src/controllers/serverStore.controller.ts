@@ -14,4 +14,8 @@ export class ServerStore {
   addUser(user: IUser): void {
     this._users = [...this._users, user];
   }
+
+  removeUser(idFromClient: string): void {
+    this._users = this._users.filter((user) => user.id !== idFromClient);
+  }
 }

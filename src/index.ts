@@ -13,10 +13,10 @@ const io = new Server(httpServer, {
 });
 
 const PORT = 4000;
-const serverServer = new ServerStore();
+const serverStore = new ServerStore();
 
 io.on('connection', (socket) => {
-  console.log(socket);
+  console.log(socket.handshake.auth);
   // join conversation
   const { roomId } = socket.handshake.query;
   if (roomId) {
@@ -24,8 +24,18 @@ io.on('connection', (socket) => {
   }
 
   socket.on(ADD_USER, (user: IUser) => {
-    serverServer.addUser(user);
-    console.log(serverServer.users);
+    serverStore.addUser(user);
+    io.emit('READ_USER', serverStore.users);
+    console.log(serverStore.users);
+  });
+
+  // private messsage
+  socket.on('PRIVATE_MESSAGE', ({ message, to }) => {
+    console.log({ message, to });
+    socket.to(to).emit('PRIVATE_MESSAGE', {
+      message,
+      from: socket.id,
+    });
   });
 
   // Join for new messages
@@ -37,7 +47,11 @@ io.on('connection', (socket) => {
 
   // Leave the room if the user closes the socket
   socket.on('disconnect', () => {
-    console.log('object');
+    console.log(socket.id);
+    serverStore.removeUser(socket.id);
+
+    io.emit('READ_USER', serverStore.users);
+    // console.log(serverStore.users);
     if (roomId) {
       socket.leave(roomId as string);
     }
