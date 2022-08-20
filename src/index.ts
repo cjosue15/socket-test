@@ -56,9 +56,7 @@ io.on('connection', (socket) => {
     session: (socket as ISocket).session,
   });
 
-  io.emit('GET_USERS', serverStore.sessions);
-  console.log(serverStore.sessions);
-  console.log('HOLIII');
+  io.emit('GET_SESSIONS', serverStore.sessions);
   // private messsage
   socket.on('PRIVATE_MESSAGE', ({ message, to }) => {
     console.log({ message, to });
@@ -70,9 +68,8 @@ io.on('connection', (socket) => {
 
   // Leave the room if the user closes the socket
   socket.on('disconnect', () => {
-    console.log((socket as ISocket).session);
+    // console.log((socket as ISocket).session);
     // serverStore.removeSession((socket as ISocket).session.sessionID);
-
     // io.emit('READ_USER', serverStore.sessions);
     // console.log(serverStore.sessions);
     // if (roomId) {
